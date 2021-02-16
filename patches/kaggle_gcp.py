@@ -310,6 +310,28 @@ def init_natural_language():
     monkeypatch_client(language.LanguageServiceAsyncClient, kernel_credentials)
     return language
 
+def init_ucaip():
+    from google.cloud import aiplatform
+    if not is_user_secrets_token_set():
+        return
+
+    from kaggle_gcp import get_integrations
+    if not get_integrations().has_cloudai():
+        return
+
+    from kaggle_secrets import GcpTarget
+    from kaggle_gcp import KaggleKernelCredentials
+    kaggle_kernel_credentials = KaggleKernelCredentials(target=GcpTarget.CLOUDAI)
+
+    # Patch the ucaip clients
+    # for loading in datasets
+    monkeypatch_client(aiplatform.gapic.DatasetServiceClient, kaggle_kernel_credentials)
+    # for creating training pipelines
+    monkeypatch_client(aiplatform.gapic.PipelineServiceClient, kaggle_kernel_credentials)
+    # for creating custom jobs and hyperparameter tuning
+    monkeypatch_client(aiplatform.gapic.JobServiceClient, kaggle_kernel_credentials)
+
+
 def init_video_intelligence():
     from google.cloud import videointelligence
     if not is_user_secrets_token_set():
@@ -353,6 +375,7 @@ def init():
     init_natural_language()
     init_video_intelligence()
     init_vision()
+    init_ucaip()
 
 # We need to initialize the monkeypatching of the client libraries
 # here since there is a circular dependency between our import hook version

@@ -276,6 +276,7 @@ RUN pip install --upgrade cython && \
     pip install google-cloud-language==2.* && \
     pip install google-cloud-videointelligence==2.* && \
     pip install google-cloud-vision==2.* && \
+    pip install google-cloud-aiplatform && \ 
     pip install ortools && \
     pip install scattertext && \
     # Pandas data reader
